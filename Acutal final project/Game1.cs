@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using Microsoft.Xna.Framework.Audio;
 using System;
 using System.Collections.Generic;
 
@@ -19,6 +20,8 @@ namespace Acutal_final_project
         Random generator;
         Texture2D Target;
         Rectangle targetRect;
+
+        SoundEffect gunShot;
 
         int Score;
 
@@ -50,6 +53,8 @@ namespace Acutal_final_project
             targets = new List<Targets>();
             Speed = new Vector2(generator.Next(-4, 4), generator.Next(-4, 4));
             textFont = Content.Load<SpriteFont>("File");
+
+            gunShot = Content.Load<SoundEffect>("gunshot");
 
             Score = 0;
 
@@ -95,6 +100,11 @@ namespace Acutal_final_project
 
                     Score = Score + 1;
                 }
+            }
+
+            if (mouseState.LeftButton == ButtonState.Pressed && prevMouseState.LeftButton == ButtonState.Released)
+            {
+                gunShot.Play();
             }
 
             if (mouseState.LeftButton == ButtonState.Pressed || prevMouseState.LeftButton == ButtonState.Released)

@@ -32,6 +32,12 @@
 /processorParam:TextureFormat=Compressed
 /build:File.spritefont
 
+#begin gunshot.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:gunshot.wav
+
 #begin pngwing.com.png
 /importer:TextureImporter
 /processor:TextureProcessor
