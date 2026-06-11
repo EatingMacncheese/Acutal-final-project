@@ -22,10 +22,10 @@ namespace Acutal_final_project
             _speed = speed;
         }
 
-        public void Move(Rectangle window)
+        public void Move(Rectangle window, Rectangle pannelRect)
         {
             _rect.Offset(_speed);
-            if (_rect.Right > window.Width || _rect.Left < 0)
+            if (_rect.Right > pannelRect.Left || _rect.Left < 0)
                 _speed.X *= -1;
             if (_rect.Bottom > window.Height || _rect.Top < 0)
                 _speed.Y *= -1;

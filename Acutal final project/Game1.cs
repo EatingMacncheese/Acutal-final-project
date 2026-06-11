@@ -52,7 +52,7 @@ namespace Acutal_final_project
             _graphics.PreferredBackBufferWidth = window.Width;
             _graphics.PreferredBackBufferHeight = window.Height;
             _graphics.ApplyChanges();
-            targetRect = new Rectangle(generator.Next(0, window.Width), generator.Next(0, window.Height), 50, 50);
+            targetRect = new Rectangle(generator.Next(0, 550), generator.Next(0, window.Height), 50, 50);
             targets = new List<Targets>();
             Speed = new Vector2(generator.Next(-4, 4), generator.Next(-4, 4));
             textFont = Content.Load<SpriteFont>("File");
@@ -97,7 +97,7 @@ namespace Acutal_final_project
                 // Move target
 
 
-                targets[i].Move(window);
+                targets[i].Move(window, pannelRect);
 
 
 
@@ -131,7 +131,8 @@ namespace Acutal_final_project
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
-            // TODO: Add your drawing code here
+            // TODO: Add your drawing code here 
+
 
             _spriteBatch.Begin();
 
