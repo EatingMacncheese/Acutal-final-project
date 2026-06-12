@@ -52,7 +52,7 @@ namespace Acutal_final_project
             _graphics.PreferredBackBufferWidth = window.Width;
             _graphics.PreferredBackBufferHeight = window.Height;
             _graphics.ApplyChanges();
-            targetRect = new Rectangle(generator.Next(0, 550), generator.Next(0, window.Height), 50, 50);
+            targetRect = new Rectangle(generator.Next(0 ,500), generator.Next(0, window.Height), 50, 50);
             targets = new List<Targets>();
             Speed = new Vector2(generator.Next(-4, 4), generator.Next(-4, 4));
             textFont = Content.Load<SpriteFont>("File");
@@ -142,11 +142,12 @@ namespace Acutal_final_project
                 _spriteBatch.Draw(target.Texture, target.Bounds, Color.White);
             }
 
-            _spriteBatch.Draw(mouseTexture, mouseRect, Color.White);
+            
 
             _spriteBatch.DrawString(textFont, "Score: " + Score, new Vector2(10, 10), Color.Black);
             _spriteBatch.Draw(pannelTexture, pannelRect, Color.White);
             _spriteBatch.Draw(buttonTexture, buttonRect, Color.White);
+            _spriteBatch.Draw(mouseTexture, mouseRect, Color.White);
             _spriteBatch.End();
 
             base.Draw(gameTime);
