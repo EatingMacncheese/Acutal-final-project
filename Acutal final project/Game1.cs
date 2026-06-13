@@ -1,154 +1,227 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using Microsoft.Xna.Framework.Audio;
 using System;
 using System.Collections.Generic;
 
-namespace Acutal_final_project
+namespace Actual_final_project
 {
     public class Game1 : Game
     {
-        private GraphicsDeviceManager _graphics;
-        private SpriteBatch _spriteBatch;
+        private GraphicsDeviceManager graphics;
+        private SpriteBatch spriteBatch;
 
-        Vector2 Speed;
+        
         Texture2D mouseTexture;
         Rectangle mouseRect;
-        MouseState mouseState, prevMouseState;
+        MouseState mouseState;
+        MouseState prevMouseState;
+
+        
         Rectangle window;
-        Random generator;
-        Texture2D Target;
-        Rectangle targetRect;
-        Texture2D pannelTexture, buttonTexture;
+        Random random = new Random();
+        List<Targets> targets = new List<Targets>();
 
-        Rectangle pannelRect, buttonRect;
+        
+        Texture2D targetTexture;
+        Texture2D panelTexture;
+        Texture2D buttonTexture;
 
+        
+        Rectangle panelRect;
+        Rectangle button1;
+        Rectangle button2;
+        Rectangle button3;
+
+        
         SoundEffect gunShot;
 
-        int Score;
+        
+        SpriteFont font;
 
-        SpriteFont textFont;
+        
+        int score = 0;
+        int pointsPerClick = 1;
 
-        Texture2D targetTexture;
+        int maxTargets = 5;
+        float spawnDelay = 2f;
+        float spawnTimer = 0f;
 
-        List<Targets> targets;
+        int costTargets = 25;
+        int costSpeed = 25;
+        int costPoints = 25;
+
         public Game1()
         {
-            _graphics = new GraphicsDeviceManager(this);
+            graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
             IsMouseVisible = false;
         }
 
         protected override void Initialize()
         {
-            // TODO: Add your initialization logic here
+            window = new Rectangle(0, 0, 900, 600);
+
+            graphics.PreferredBackBufferWidth = window.Width;
+            graphics.PreferredBackBufferHeight = window.Height;
+            graphics.ApplyChanges();
+
+            mouseRect = new Rectangle(0, 0, 20, 20);
+
+            panelRect = new Rectangle(600, 0, 300, 600);
+
+            button1 = new Rectangle(650, 25, 200, 40);
+            button2 = new Rectangle(650, 80, 200, 40);
+            button3 = new Rectangle(650, 135, 200, 40);
 
             base.Initialize();
-            window = new Rectangle(0, 0, 900, 600);
-            mouseRect = new Rectangle(10, 10, 20, 20);
-            
-            generator = new Random();
-            _graphics.PreferredBackBufferWidth = window.Width;
-            _graphics.PreferredBackBufferHeight = window.Height;
-            _graphics.ApplyChanges();
-            targetRect = new Rectangle(generator.Next(0 ,500), generator.Next(0, window.Height), 50, 50);
-            targets = new List<Targets>();
-            Speed = new Vector2(generator.Next(-4, 4), generator.Next(-4, 4));
-            textFont = Content.Load<SpriteFont>("File");
-
-            pannelRect = new Rectangle(600, 0, 300, 600);
-            buttonRect = new Rectangle(650, 25, 200, 35);
-
-            gunShot = Content.Load<SoundEffect>("gunshot");
-
-            Score = 0;
-
-            for (int i = 0; i < 100; i++)
-            {
-                int size = generator.Next(40, 100);
-                targets.Add(new Targets(targetTexture, new Rectangle(generator.Next(_graphics.PreferredBackBufferWidth - size), generator.Next(_graphics.PreferredBackBufferHeight - size), size, size), new Vector2(generator.Next(-4, 4), generator.Next(-4, 4))));
-            }
         }
 
         protected override void LoadContent()
         {
-            _spriteBatch = new SpriteBatch(GraphicsDevice);
+            spriteBatch = new SpriteBatch(GraphicsDevice);
 
-            // TODO: use this.Content to load your game content here
-
+            
             mouseTexture = Content.Load<Texture2D>("pngwing.com");
             targetTexture = Content.Load<Texture2D>("enemy");
-            pannelTexture = Content.Load<Texture2D>("red");
+            panelTexture = Content.Load<Texture2D>("red");
             buttonTexture = Content.Load<Texture2D>("dark red");
+
+            font = Content.Load<SpriteFont>("File");
+            gunShot = Content.Load<SoundEffect>("gunshot");
+
+            for (int i = 0; i < 3; i++)
+                SpawnTarget();
         }
 
         protected override void Update(GameTime gameTime)
         {
-            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
+            if (Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
+
             prevMouseState = mouseState;
             mouseState = Mouse.GetState();
+
             mouseRect.Location = mouseState.Position;
 
+            // spawn system
+            spawnTimer += (float)gameTime.ElapsedGameTime.TotalSeconds;
 
+            if (spawnTimer >= spawnDelay && targets.Count < maxTargets)
+            {
+                SpawnTarget();
+                spawnTimer = 0f;
+            }
+
+            // update targets
             for (int i = 0; i < targets.Count; i++)
             {
-                // Move target
+                targets[i].Move(window, panelRect);
 
-
-                targets[i].Move(window, pannelRect);
-
-
-
-                if (mouseState.LeftButton == ButtonState.Pressed && prevMouseState.LeftButton == ButtonState.Released && targets[i].Bounds.Contains(mouseRect))
+                if (mouseState.LeftButton == ButtonState.Pressed &&
+                    prevMouseState.LeftButton == ButtonState.Released &&
+                    targets[i].Bounds.Contains(mouseRect))
                 {
                     targets.RemoveAt(i);
                     i--;
-
-                    Score = Score + 1;
+                    score += pointsPerClick;
                 }
             }
 
-            if (mouseState.LeftButton == ButtonState.Pressed && prevMouseState.LeftButton == ButtonState.Released)
+            // upgrades
+            if (mouseState.LeftButton == ButtonState.Pressed &&
+                prevMouseState.LeftButton == ButtonState.Released)
             {
-                gunShot.Play();
+                gunShot?.Play();
+
+                if (button1.Contains(mouseRect) && score >= costTargets)
+                {
+                    score -= costTargets;
+                    maxTargets++;
+                    costTargets += 25;
+                }
+
+                if (button2.Contains(mouseRect) && score >= costSpeed)
+                {
+                    score -= costSpeed;
+
+                    if (spawnDelay > 0.5f)
+                        spawnDelay -= 0.2f;
+
+                    costSpeed += 25;
+                }
+
+                if (button3.Contains(mouseRect) && score >= costPoints)
+                {
+                    score -= costPoints;
+                    pointsPerClick++;
+                    costPoints += 25;
+                }
             }
 
-            if (mouseState.LeftButton == ButtonState.Pressed || prevMouseState.LeftButton == ButtonState.Released)
-                
-
-                // CLICKER ELEMENTS
-
-            
-
-            // TODO: Add your update logic here
-
             base.Update(gameTime);
+        }
+
+        private void SpawnTarget()
+        {
+            if (targetTexture == null)
+                return;
+
+            int x = random.Next(0, 550);
+            int y = random.Next(0, 550);
+
+            Rectangle rect = new Rectangle(x, y, 50, 50);
+
+            Vector2 speed = new Vector2(
+                random.Next(-4, 5),
+                random.Next(-4, 5)
+            );
+
+            targets.Add(new Targets(targetTexture, rect, speed));
         }
 
         protected override void Draw(GameTime gameTime)
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
-            // TODO: Add your drawing code here 
+            spriteBatch.Begin();
+
+            foreach (var t in targets)
+                spriteBatch.Draw(t.Texture, t.Bounds, Color.White);
+
+            spriteBatch.Draw(panelTexture, panelRect, Color.White);
+
+            spriteBatch.Draw(buttonTexture, button1, Color.White);
+            spriteBatch.Draw(buttonTexture, button2, Color.White);
+            spriteBatch.Draw(buttonTexture, button3, Color.White);
+
+            spriteBatch.DrawString(font, "Score: " + score, new Vector2(10, 10), Color.Black);
+
+            spriteBatch.DrawString(font, "Targets: " + maxTargets, new Vector2(530, 10), Color.White);
+            spriteBatch.DrawString(font, "Spawn: " + spawnDelay.ToString("0.0"), new Vector2(530, 30), Color.White);
 
 
-            _spriteBatch.Begin();
+            spriteBatch.DrawString(font,"UPGRADES",new Vector2(650, 0),Color.Yellow);
 
+            // BUTTON 1 - More Targets
+            spriteBatch.DrawString(font,"More Targets ($" + costTargets + ")", new Vector2(660, 25), Color.White);
 
-            foreach (Targets target in targets)
-            {
-                _spriteBatch.Draw(target.Texture, target.Bounds, Color.White);
-            }
+            spriteBatch.DrawString(font,"Increases max enemies", new Vector2(660, 45), Color.Gray);
 
-            
+            // BUTTON 2 - Faster Spawn
+            spriteBatch.DrawString(font,"Faster Spawn ($" + costSpeed + ")", new Vector2(660, 80), Color.White);
 
-            _spriteBatch.DrawString(textFont, "Score: " + Score, new Vector2(10, 10), Color.Black);
-            _spriteBatch.Draw(pannelTexture, pannelRect, Color.White);
-            _spriteBatch.Draw(buttonTexture, buttonRect, Color.White);
-            _spriteBatch.Draw(mouseTexture, mouseRect, Color.White);
-            _spriteBatch.End();
+            spriteBatch.DrawString(font,"Enemies spawn faster", new Vector2(660, 100), Color.Gray);
+
+            // BUTTON 3 - More Points
+            spriteBatch.DrawString(font,"More Points ($" + costPoints + ")", new Vector2(660, 135), Color.White);
+
+            spriteBatch.DrawString(font,"More score per click", new Vector2(660, 155), Color.Gray);
+
+            spriteBatch.Draw(mouseTexture, mouseRect, Color.White);
+
+            spriteBatch.End();
 
             base.Draw(gameTime);
         }

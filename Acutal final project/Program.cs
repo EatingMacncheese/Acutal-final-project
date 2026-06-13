@@ -1,3 +1,3 @@
 ﻿
-using var game = new Acutal_final_project.Game1();
+using var game = new Actual_final_project.Game1();
 game.Run();
