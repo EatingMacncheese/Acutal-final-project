@@ -105,7 +105,7 @@ namespace Actual_final_project
 
             mouseRect.Location = mouseState.Position;
 
-            // spawn system
+            // target spawn
             spawnTimer += (float)gameTime.ElapsedGameTime.TotalSeconds;
 
             if (spawnTimer >= spawnDelay && targets.Count < maxTargets)
@@ -204,17 +204,15 @@ namespace Actual_final_project
 
             spriteBatch.DrawString(font,"UPGRADES",new Vector2(650, 0),Color.Yellow);
 
-            // BUTTON 1 - More Targets
             spriteBatch.DrawString(font,"More Targets ($" + costTargets + ")", new Vector2(660, 25), Color.White);
 
             spriteBatch.DrawString(font,"Increases max enemies", new Vector2(660, 45), Color.Gray);
 
-            // BUTTON 2 - Faster Spawn
             spriteBatch.DrawString(font,"Faster Spawn ($" + costSpeed + ")", new Vector2(660, 80), Color.White);
 
             spriteBatch.DrawString(font,"Enemies spawn faster", new Vector2(660, 100), Color.Gray);
 
-            // BUTTON 3 - More Points
+            
             spriteBatch.DrawString(font,"More Points ($" + costPoints + ")", new Vector2(660, 135), Color.White);
 
             spriteBatch.DrawString(font,"More score per click", new Vector2(660, 155), Color.Gray);
