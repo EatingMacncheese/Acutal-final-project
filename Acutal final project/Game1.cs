@@ -30,9 +30,9 @@ namespace Actual_final_project
 
         
         Rectangle panelRect;
-        Rectangle button1;
-        Rectangle button2;
-        Rectangle button3;
+        Rectangle button1; // target spawn cap
+        Rectangle button2; // target spawn speed
+        Rectangle button3; // points per  target
 
         
         SoundEffect gunShot;
