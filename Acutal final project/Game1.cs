@@ -52,6 +52,8 @@ namespace Actual_final_project
         int costSpeed = 25;
         int costPoints = 25;
 
+        KeyboardState keyboardState;
+
         public Game1()
         {
             graphics = new GraphicsDeviceManager(this);
@@ -100,6 +102,7 @@ namespace Actual_final_project
             if (Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
 
+            keyboardState = Keyboard.GetState();
             prevMouseState = mouseState;
             mouseState = Mouse.GetState();
 
@@ -121,7 +124,7 @@ namespace Actual_final_project
 
                 if (mouseState.LeftButton == ButtonState.Pressed &&
                     prevMouseState.LeftButton == ButtonState.Released &&
-                    targets[i].Bounds.Contains(mouseRect))
+                    targets[i].Bounds.Intersects(mouseRect))
                 {
                     targets.RemoveAt(i);
                     i--;
@@ -146,7 +149,7 @@ namespace Actual_final_project
                 {
                     score -= costSpeed;
 
-                    if (spawnDelay > 0.5f)
+                    if (spawnDelay > 0.2f)
                         spawnDelay -= 0.2f;
 
                     costSpeed += 25;
@@ -158,6 +161,13 @@ namespace Actual_final_project
                     pointsPerClick++;
                     costPoints += 25;
                 }
+            }
+
+            //dev cheats
+            if (keyboardState.IsKeyDown(Keys.C))
+            {
+                score = score + 1000;
+                    
             }
 
             base.Update(gameTime);
@@ -198,7 +208,7 @@ namespace Actual_final_project
 
             spriteBatch.DrawString(font, "Score: " + score, new Vector2(10, 10), Color.Black);
 
-            spriteBatch.DrawString(font, "Targets: " + maxTargets, new Vector2(530, 10), Color.White);
+            spriteBatch.DrawString(font, "Max Targets: " + maxTargets, new Vector2(530, 10), Color.White);
             spriteBatch.DrawString(font, "Spawn: " + spawnDelay.ToString("0.0"), new Vector2(530, 30), Color.White);
 
 
